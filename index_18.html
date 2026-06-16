@@ -1,0 +1,959 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Planejamento Financeiro — Ellen Vaz</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    :root{
+      --bg-deep:#0A0C1A;--bg-card:#0F1225;--bg-elevated:#141728;
+      --navy:#1E2761;--gold:#C9A84C;--gold-light:#E8C97A;
+      --text-primary:#F0EDE6;--text-muted:#8B8FA8;
+      --success:#4CAF8C;--warning:#E8A83C;--danger:#E85C4A;
+      --border:rgba(201,168,76,0.15)
+    }
+    body{background:var(--bg-deep);color:var(--text-primary);font-family:"DM Sans",sans-serif;line-height:1.6;-webkit-font-smoothing:antialiased}
+    /* HERO */
+    .hero{min-height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:4rem 2rem;background:radial-gradient(ellipse at 50% 0%,rgba(30,39,97,0.5) 0%,transparent 70%),radial-gradient(ellipse at 80% 80%,rgba(201,168,76,0.06) 0%,transparent 60%);position:relative}
+    .hero::before{content:"";position:absolute;top:0;left:0;right:0;bottom:0;background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23C9A84C' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");opacity:.4}
+    .hero-eyebrow{font-family:"DM Sans",sans-serif;font-size:.7rem;letter-spacing:.25em;text-transform:uppercase;color:var(--gold);margin-bottom:2rem;position:relative}
+    .hero-name{font-family:"Playfair Display",serif;font-size:clamp(2.8rem,7vw,5.5rem);font-weight:400;color:var(--text-primary);margin:0 0 1rem;line-height:1.05;position:relative}
+    .hero-meta{font-family:"DM Sans",sans-serif;font-size:.8rem;color:var(--text-muted);margin-bottom:2.5rem;letter-spacing:.05em;position:relative}
+    .hero-statement{font-family:"DM Sans",sans-serif;font-size:1.05rem;color:var(--text-muted);max-width:580px;line-height:1.8;position:relative}
+    .hero-divider{width:48px;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);margin:2.5rem auto;position:relative}
+    /* NAV */
+    .nav-bar{position:sticky;top:0;z-index:100;background:rgba(10,12,26,0.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:.75rem 2rem;display:flex;gap:1.5rem;justify-content:center;flex-wrap:wrap}
+    .nav-btn{font-family:"DM Sans",sans-serif;font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--text-muted);background:none;border:none;cursor:pointer;padding:.35rem .75rem;border-radius:20px;transition:color .2s,background .2s}
+    .nav-btn:hover{color:var(--gold);background:rgba(201,168,76,.08)}
+    /* SECTIONS */
+    .section{max-width:900px;margin:0 auto;padding:5rem 2rem;border-bottom:1px solid var(--border)}
+    .section-label{font-family:"DM Sans",sans-serif;font-size:.65rem;letter-spacing:.25em;text-transform:uppercase;color:var(--gold);margin-bottom:.75rem}
+    .section-title{font-family:"Playfair Display",serif;font-size:clamp(1.8rem,4vw,2.6rem);font-weight:400;color:var(--text-primary);margin-bottom:2.5rem;line-height:1.15}
+    .section-intro{font-size:1rem;color:var(--text-muted);line-height:1.8;margin-bottom:2.5rem;max-width:700px}
+    .section-divider{width:40px;height:2px;background:linear-gradient(90deg,var(--gold),transparent);margin:.75rem 0 2.5rem}
+    /* COLLAPSIBLE */
+    .collapsible-header{display:flex;align-items:center;justify-content:space-between;cursor:pointer;padding:.9rem 1.25rem;background:var(--bg-elevated);border:1px solid var(--border);border-radius:10px;margin-bottom:.5rem;user-select:none;transition:background .2s}
+    .collapsible-header:hover{background:#1a1f3a}
+    .collapsible-title{font-size:.82rem;color:var(--text-primary);font-weight:500}
+    .collapsible-sub{font-size:.72rem;color:var(--text-muted)}
+    .collapsible-arrow{font-size:.8rem;color:var(--gold);transition:transform .3s;flex-shrink:0}
+    .collapsible-arrow.open{transform:rotate(180deg)}
+    .collapsible-body{display:none;padding-top:.5rem}
+    .collapsible-body.open{display:block}
+    /* METRIC CARDS */
+    .metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:1rem;margin:2rem 0}
+    .metric-card{background:var(--bg-card);border:1px solid var(--border);border-radius:14px;padding:1.5rem;transition:border-color .2s}
+    .metric-card:hover{border-color:rgba(201,168,76,0.35)}
+    .metric-label{font-family:"DM Sans",sans-serif;font-size:.65rem;text-transform:uppercase;letter-spacing:.12em;color:var(--text-muted);margin-bottom:.5rem}
+    .metric-value{font-family:"DM Mono",monospace;font-size:1.65rem;color:var(--gold);font-weight:500;line-height:1}
+    .metric-sub{font-family:"DM Sans",sans-serif;font-size:.78rem;color:var(--text-muted);margin-top:.4rem}
+    /* CHARTS */
+    .chart-row{display:grid;grid-template-columns:1fr 1fr;gap:2rem;margin:2.5rem 0}
+    .chart-box{background:var(--bg-card);border:1px solid var(--border);border-radius:14px;padding:1.75rem}
+    .chart-box-title{font-family:"DM Sans",sans-serif;font-size:.7rem;text-transform:uppercase;letter-spacing:.15em;color:var(--text-muted);margin-bottom:1.25rem;text-align:center}
+    .chart-container{position:relative;height:240px}
+    /* ARCA BLOCKS */
+    .arca-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;margin:2rem 0}
+    .arca-card{background:var(--bg-card);border:1px solid var(--border);border-radius:14px;padding:1.5rem;border-top:2px solid}
+    .arca-card.acoes{border-top-color:var(--gold)}
+    .arca-card.real-estate{border-top-color:#4CAF8C}
+    .arca-card.caixa{border-top-color:#5B9BD5}
+    .arca-card.alternativos{border-top-color:#9B59B6}
+    .arca-letter{font-family:"Playfair Display",serif;font-size:2rem;font-weight:700;line-height:1;margin-bottom:.25rem}
+    .arca-letter.acoes{color:var(--gold)}
+    .arca-letter.real-estate{color:#4CAF8C}
+    .arca-letter.caixa{color:#5B9BD5}
+    .arca-letter.alternativos{color:#9B59B6}
+    .arca-name{font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;color:var(--text-muted);margin-bottom:.75rem}
+    .arca-pct-row{display:flex;align-items:center;gap:.75rem;margin-bottom:.4rem}
+    .arca-pct-label{font-size:.7rem;color:var(--text-muted);width:55px;flex-shrink:0}
+    .arca-pct-bar-wrap{flex:1;background:rgba(255,255,255,0.06);border-radius:20px;height:6px;overflow:hidden}
+    .arca-pct-bar{height:100%;border-radius:20px}
+    .arca-pct-val{font-family:"DM Mono",monospace;font-size:.78rem;color:var(--text-primary);width:38px;text-align:right}
+    .arca-desc{font-size:.82rem;color:var(--text-muted);line-height:1.6;margin-top:1rem;padding-top:1rem;border-top:1px solid var(--border)}
+    /* ATIVOS TABLE */
+    .ativo-list{display:flex;flex-direction:column;gap:.6rem;margin-top:1rem}
+    .ativo-item{background:var(--bg-card);border:1px solid var(--border);border-radius:10px;padding:1rem 1.25rem;display:flex;align-items:center;gap:1rem}
+    .ativo-ticker{font-family:"DM Mono",monospace;font-size:.85rem;color:var(--gold);font-weight:500;min-width:68px}
+    .ativo-info{flex:1}
+    .ativo-name{font-size:.88rem;color:var(--text-primary);font-weight:500;margin-bottom:.15rem}
+    .ativo-desc{font-size:.78rem;color:var(--text-muted);line-height:1.5}
+    .ativo-value{text-align:right;flex-shrink:0}
+    .ativo-val{font-family:"DM Mono",monospace;font-size:.88rem;color:var(--text-primary)}
+    .ativo-pct{font-size:.72rem;color:var(--text-muted);margin-top:.15rem}
+    .ativo-badge{font-size:.65rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;padding:.2rem .55rem;border-radius:12px;white-space:nowrap;flex-shrink:0}
+    .badge-ok{background:rgba(76,175,140,.12);color:var(--success);border:1px solid rgba(76,175,140,.3)}
+    .badge-att{background:rgba(232,168,60,.12);color:var(--warning);border:1px solid rgba(232,168,60,.3)}
+    /* APORTE SECTION */
+    .aporte-card{background:var(--bg-card);border:1px solid var(--border);border-radius:14px;padding:1.75rem;margin-bottom:1rem}
+    .aporte-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem}
+    .aporte-classe{font-size:.65rem;text-transform:uppercase;letter-spacing:.15em;color:var(--text-muted)}
+    .aporte-total{font-family:"DM Mono",monospace;font-size:1.3rem;color:var(--gold)}
+    .aporte-items{display:flex;flex-direction:column;gap:.5rem}
+    .aporte-line{display:flex;align-items:center;justify-content:space-between;padding:.6rem .75rem;background:var(--bg-elevated);border-radius:8px}
+    .aporte-line-name{font-size:.85rem;color:var(--text-primary)}
+    .aporte-line-val{font-family:"DM Mono",monospace;font-size:.85rem;color:var(--gold-light)}
+    .aporte-note{font-size:.78rem;color:var(--text-muted);line-height:1.6;margin-top:.75rem;padding-top:.75rem;border-top:1px solid var(--border)}
+    /* FINDING */
+    .finding-list{display:flex;flex-direction:column;gap:.75rem}
+    .finding-item{display:flex;gap:1rem;align-items:flex-start;padding:1.25rem;background:var(--bg-card);border:1px solid var(--border);border-radius:12px}
+    .finding-badge{font-family:"DM Sans",sans-serif;font-size:.65rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;padding:.3rem .7rem;border-radius:20px;white-space:nowrap;align-self:flex-start;flex-shrink:0;margin-top:.15rem}
+    .badge-success{background:rgba(76,175,140,.12);color:var(--success);border:1px solid rgba(76,175,140,.3)}
+    .badge-warning{background:rgba(232,168,60,.12);color:var(--warning);border:1px solid rgba(232,168,60,.3)}
+    .badge-info{background:rgba(30,39,97,.4);color:#7BA7E0;border:1px solid rgba(91,155,213,.3)}
+    .finding-title{font-size:.92rem;color:var(--text-primary);font-weight:500;margin-bottom:.3rem}
+    .finding-desc{font-size:.82rem;color:var(--text-muted);line-height:1.6}
+    /* INDEPENDENCIA */
+    .indep-hero{background:linear-gradient(135deg,rgba(30,39,97,0.6),rgba(201,168,76,0.08));border:1px solid rgba(201,168,76,0.25);border-radius:18px;padding:2.5rem;text-align:center;margin-bottom:2rem}
+    .indep-valor{font-family:"DM Mono",monospace;font-size:2.8rem;color:var(--gold);font-weight:500;line-height:1;margin-bottom:.5rem}
+    .indep-label{font-size:.75rem;text-transform:uppercase;letter-spacing:.18em;color:var(--text-muted)}
+    .indep-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1rem;margin:2rem 0}
+    .indep-card{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:1.25rem;text-align:center}
+    .indep-card-val{font-family:"DM Mono",monospace;font-size:1.3rem;color:var(--gold);margin-bottom:.3rem}
+    .indep-card-label{font-size:.7rem;text-transform:uppercase;letter-spacing:.1em;color:var(--text-muted)}
+    .indep-chart-wrap{background:var(--bg-card);border:1px solid var(--border);border-radius:14px;padding:1.75rem;margin:1.5rem 0}
+    /* OBJETIVOS */
+    .obj-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1.25rem}
+    .obj-card{background:var(--bg-card);border:1px solid var(--border);border-radius:14px;padding:1.5rem}
+    .obj-icon{font-size:1.75rem;margin-bottom:.75rem}
+    .obj-name{font-size:.95rem;color:var(--text-primary);font-weight:600;margin-bottom:.3rem}
+    .obj-date{font-family:"DM Mono",monospace;font-size:.78rem;color:var(--text-muted);margin-bottom:1rem}
+    .obj-progress-wrap{background:rgba(255,255,255,0.06);border-radius:20px;height:6px;overflow:hidden;margin-bottom:.4rem}
+    .obj-progress-bar{height:100%;border-radius:20px;background:linear-gradient(90deg,var(--gold),var(--gold-light))}
+    .obj-progress-labels{display:flex;justify-content:space-between;font-family:"DM Mono",monospace;font-size:.72rem;color:var(--text-muted)}
+    .obj-meta{font-size:.8rem;color:var(--text-muted);margin-top:.75rem;padding-top:.75rem;border-top:1px solid var(--border);line-height:1.6}
+    /* TIMELINE */
+    .timeline{display:flex;flex-direction:column;gap:1.5rem}
+    .timeline-phase{background:var(--bg-card);border:1px solid var(--border);border-radius:14px;padding:1.5rem}
+    .phase-header{display:flex;align-items:center;gap:.75rem;margin-bottom:1.25rem}
+    .phase-badge{font-size:.65rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;padding:.3rem .7rem;border-radius:20px;background:rgba(201,168,76,.12);color:var(--gold);border:1px solid rgba(201,168,76,.3)}
+    .phase-range{font-family:"DM Mono",monospace;font-size:.78rem;color:var(--text-muted)}
+    .phase-actions{display:flex;flex-direction:column;gap:.6rem}
+    .action-item{display:flex;align-items:flex-start;gap:.75rem;padding:.75rem;background:var(--bg-elevated);border-radius:8px}
+    .action-icon{color:var(--gold);font-size:.85rem;flex-shrink:0;margin-top:.1rem}
+    .action-title{font-size:.88rem;color:var(--text-primary);font-weight:500;margin-bottom:.15rem}
+    .action-who{font-size:.75rem;color:var(--text-muted)}
+    /* FOOTER */
+    .footer{text-align:center;padding:4rem 2rem;border-top:1px solid var(--border)}
+    .footer-monogram{width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,var(--navy),var(--gold));display:flex;align-items:center;justify-content:center;font-family:"Playfair Display",serif;font-size:1.2rem;color:#fff;margin:0 auto 1rem}
+    .footer-name{font-family:"Playfair Display",serif;font-size:1.3rem;color:var(--text-primary);margin-bottom:.3rem}
+    .footer-title{font-size:.78rem;color:var(--text-muted);margin-bottom:.5rem}
+    .footer-brand{font-size:.75rem;color:var(--gold);letter-spacing:.1em;text-transform:uppercase;margin-bottom:1.25rem}
+    .footer-contact{font-size:.82rem;color:var(--text-muted);margin-bottom:.4rem}
+    .footer-disclaimer{font-size:.72rem;color:rgba(139,143,168,.5);max-width:500px;margin:0 auto;line-height:1.7}
+    /* RESPONSIVE */
+    @media(max-width:640px){
+      .arca-grid,.chart-row,.obj-grid{grid-template-columns:1fr}
+      .metric-grid{grid-template-columns:1fr 1fr}
+      .section{padding:3.5rem 1.25rem}
+      .ativo-item{flex-wrap:wrap}
+      .nav-bar{gap:.75rem;padding:.75rem 1rem}
+    }
+    #pwd-input:focus{border-color:rgba(201,168,76,0.6);box-shadow:0 0 0 3px rgba(201,168,76,0.1)}
+  </style>
+</head>
+<body>
+
+<!-- PASSWORD OVERLAY -->
+<div id="password-overlay" style="position:fixed;top:0;left:0;width:100%;height:100%;background:#0A0C1A;z-index:9999;display:flex;align-items:center;justify-content:center;flex-direction:column;">
+  <div style="text-align:center;padding:2.5rem;max-width:380px;width:100%">
+    <div style="width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,#1E2761,#C9A84C);display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:1.2rem;color:#fff;margin:0 auto 1.5rem">MM</div>
+    <div style="font-family:'Playfair Display',serif;font-size:1.4rem;color:#C9A84C;margin-bottom:.4rem">Planejamento Financeiro</div>
+    <div style="font-family:'DM Sans',sans-serif;font-size:.82rem;color:#8B8FA8;margin-bottom:2.5rem;letter-spacing:.05em">Ellen Vaz · Junho 2026</div>
+    <input id="pwd-input" type="password" placeholder="Senha de acesso"
+      style="background:#141728;border:1px solid rgba(201,168,76,0.25);color:#F0EDE6;padding:.85rem 1.25rem;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:.95rem;width:100%;outline:none;text-align:center;transition:border-color .2s,box-shadow .2s">
+    <br><br>
+    <button onclick="checkPassword()"
+      style="background:linear-gradient(135deg,#C9A84C,#E8C97A);color:#0A0C1A;border:none;padding:.85rem 2.5rem;border-radius:10px;font-family:'DM Sans',sans-serif;font-weight:600;font-size:.95rem;cursor:pointer;width:100%;letter-spacing:.03em">
+      Acessar
+    </button>
+    <div id="pwd-error" style="color:#E85C4A;font-size:.82rem;margin-top:1rem;display:none">Senha incorreta. Tente novamente.</div>
+  </div>
+</div>
+
+<!-- MAIN CONTENT -->
+<div id="main-content" style="display:none">
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-eyebrow">Planejamento Financeiro Pessoal · CFP®</div>
+    <h1 class="hero-name">Ellen Vaz</h1>
+    <div class="hero-meta">Junho 2026 · Elaborado por Matheus Melo, CFP®</div>
+    <div class="hero-divider"></div>
+    <p class="hero-statement">Este relatório apresenta o diagnóstico completo da sua carteira, o plano de aporte deste mês e o caminho estruturado para que você conquiste seus objetivos de vida com segurança e inteligência.</p>
+  </section>
+
+  <!-- NAV BAR -->
+  <nav class="nav-bar">
+    <button class="nav-btn" onclick="scrollTo('sec-snapshot')">Situação Atual</button>
+    <button class="nav-btn" onclick="scrollTo('sec-arca')">Metodologia ARCA</button>
+    <button class="nav-btn" onclick="scrollTo('sec-carteira')">Carteira</button>
+    <button class="nav-btn" onclick="scrollTo('sec-aporte')">Aporte do Mês</button>
+    <button class="nav-btn" onclick="scrollTo('sec-diagnostico')">Diagnóstico</button>
+    <button class="nav-btn" onclick="scrollTo('sec-objetivos')">Projetos de Vida</button>
+    <button class="nav-btn" onclick="scrollTo('sec-independencia')">Independência</button>
+    <button class="nav-btn" onclick="scrollTo('sec-plano')">Plano de Ação</button>
+  </nav>
+
+  <!-- SNAPSHOT PATRIMONIAL -->
+  <section class="section" id="sec-snapshot">
+    <div class="section-label">Situação Atual</div>
+    <h2 class="section-title">Onde você está hoje</h2>
+    <div class="section-divider"></div>
+    <p class="section-intro">Com o aporte deste mês, seu patrimônio deu mais um passo importante. Veja o panorama completo da sua situação financeira.</p>
+
+    <div class="metric-grid">
+      <div class="metric-card">
+        <div class="metric-label">Patrimônio Investido</div>
+        <div class="metric-value">R$ 35.127</div>
+        <div class="metric-sub">Após aporte de R$ 10.483</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Aporte Deste Mês</div>
+        <div class="metric-value">R$ 10.483</div>
+        <div class="metric-sub">Alocado conforme estratégia</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Nº de Produtos</div>
+        <div class="metric-value">14</div>
+        <div class="metric-sub">Carteira diversificada ARCA</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Perfil de Risco</div>
+        <div class="metric-value" style="font-family:'DM Sans',sans-serif;font-size:1.2rem">Conservador</div>
+        <div class="metric-sub">Estratégia: Valorização</div>
+      </div>
+    </div>
+
+    <div class="chart-row">
+      <div class="chart-box">
+        <div class="chart-box-title">Alocação Atual</div>
+        <div class="chart-container"><canvas id="chartAtual"></canvas></div>
+      </div>
+      <div class="chart-box">
+        <div class="chart-box-title">Alocação Objetivo</div>
+        <div class="chart-container"><canvas id="chartObjetivo"></canvas></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- METODOLOGIA ARCA -->
+  <section class="section" id="sec-arca">
+    <div class="section-label">Metodologia</div>
+    <h2 class="section-title">A estrutura que guia sua carteira</h2>
+    <div class="section-divider"></div>
+    <p class="section-intro">Toda decisão de investimento no seu planejamento segue a metodologia ARCA — quatro classes de ativos que se complementam e trabalham juntas para proteger e fazer crescer o seu patrimônio.</p>
+
+    <div class="arca-grid">
+      <div class="arca-card acoes">
+        <div class="arca-letter acoes">A</div>
+        <div class="arca-name">Ações e Negócios</div>
+        <div class="arca-pct-row">
+          <div class="arca-pct-label">Atual</div>
+          <div class="arca-pct-bar-wrap"><div class="arca-pct-bar" style="width:9.9%;background:var(--gold)"></div></div>
+          <div class="arca-pct-val">9,9%</div>
+        </div>
+        <div class="arca-pct-row">
+          <div class="arca-pct-label">Objetivo</div>
+          <div class="arca-pct-bar-wrap"><div class="arca-pct-bar" style="width:5%;background:rgba(201,168,76,0.35)"></div></div>
+          <div class="arca-pct-val">5%</div>
+        </div>
+        <div class="arca-desc">Participação em empresas que crescem e geram valor ao longo do tempo. É a parcela de maior potencial de ganho — e também a mais volátil. Por isso, no seu perfil conservador, mantemos uma fatia pequena e bem selecionada.</div>
+      </div>
+
+      <div class="arca-card real-estate">
+        <div class="arca-letter real-estate">R</div>
+        <div class="arca-name">Real Estate · FIIs</div>
+        <div class="arca-pct-row">
+          <div class="arca-pct-label">Atual</div>
+          <div class="arca-pct-bar-wrap"><div class="arca-pct-bar" style="width:20.9%;background:#4CAF8C"></div></div>
+          <div class="arca-pct-val">20,9%</div>
+        </div>
+        <div class="arca-pct-row">
+          <div class="arca-pct-label">Objetivo</div>
+          <div class="arca-pct-bar-wrap"><div class="arca-pct-bar" style="width:15%;background:rgba(76,175,140,0.35)"></div></div>
+          <div class="arca-pct-val">15%</div>
+        </div>
+        <div class="arca-desc">Cotas de fundos que investem em imóveis de verdade: shoppings, lajes corporativas, galpões logísticos. Pagam dividendos mensais isentos de IR — uma renda passiva que cresce junto com o seu patrimônio.</div>
+      </div>
+
+      <div class="arca-card caixa">
+        <div class="arca-letter caixa">C</div>
+        <div class="arca-name">Caixa · Renda Fixa</div>
+        <div class="arca-pct-row">
+          <div class="arca-pct-label">Atual</div>
+          <div class="arca-pct-bar-wrap"><div class="arca-pct-bar" style="width:57%;background:#5B9BD5"></div></div>
+          <div class="arca-pct-val">57,0%</div>
+        </div>
+        <div class="arca-pct-row">
+          <div class="arca-pct-label">Objetivo</div>
+          <div class="arca-pct-bar-wrap"><div class="arca-pct-bar" style="width:75%;background:rgba(91,155,213,0.35)"></div></div>
+          <div class="arca-pct-val">75%</div>
+        </div>
+        <div class="arca-desc">O coração do seu plano. Alta liquidez, previsibilidade e segurança. É aqui que ficam os recursos para seus projetos de vida — o carro e o apartamento — rendendo acima da inflação enquanto você acumula.</div>
+      </div>
+
+      <div class="arca-card alternativos">
+        <div class="arca-letter alternativos">A</div>
+        <div class="arca-name">Alternativos</div>
+        <div class="arca-pct-row">
+          <div class="arca-pct-label">Atual</div>
+          <div class="arca-pct-bar-wrap"><div class="arca-pct-bar" style="width:12.1%;background:#9B59B6"></div></div>
+          <div class="arca-pct-val">12,1%</div>
+        </div>
+        <div class="arca-pct-row">
+          <div class="arca-pct-label">Objetivo</div>
+          <div class="arca-pct-bar-wrap"><div class="arca-pct-bar" style="width:5%;background:rgba(155,89,182,0.35)"></div></div>
+          <div class="arca-pct-val">5%</div>
+        </div>
+        <div class="arca-desc">Ativos que se comportam de forma diferente do mercado brasileiro — exposição internacional (dólar, mundo), fundos multimercado e Bitcoin. Protegem contra riscos específicos do Brasil e adicionam diversificação extra.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CARTEIRA ATUAL — ATIVOS -->
+  <section class="section" id="sec-carteira">
+    <div class="section-label">Carteira Atual</div>
+    <h2 class="section-title">Onde seu dinheiro está hoje</h2>
+    <div class="section-divider"></div>
+    <p class="section-intro">Cada ativo da sua carteira tem um papel específico no seu planejamento. Clique em cada classe para expandir e entender o que cada um faz pelo seu patrimônio.</p>
+
+    <!-- AÇÕES -->
+    <div style="margin-bottom:.75rem">
+      <div class="collapsible-header" onclick="toggleCollapse('col-acoes')">
+        <div>
+          <div class="collapsible-title">A — Ações e Negócios</div>
+          <div class="collapsible-sub">R$ 2.437 · 9,9% da carteira · 5 ativos</div>
+        </div>
+        <div class="collapsible-arrow" id="arrow-col-acoes">▼</div>
+      </div>
+      <div class="collapsible-body" id="col-acoes">
+        <div class="ativo-list">
+          <div class="ativo-item">
+            <div class="ativo-ticker">WIZC3</div>
+            <div class="ativo-info">
+              <div class="ativo-name">Wiz Co.</div>
+              <div class="ativo-desc">Empresa de distribuição de seguros com histórico consistente de dividendos. Dividend Yield de 6,72% nos últimos 12 meses — gera renda enquanto você mantém a posição.</div>
+            </div>
+            <div class="ativo-value"><div class="ativo-val">R$ 471</div><div class="ativo-pct">19,3% da classe</div></div>
+            <div class="ativo-badge badge-ok">Recomendado</div>
+          </div>
+          <div class="ativo-item">
+            <div class="ativo-ticker">GMAT3</div>
+            <div class="ativo-info">
+              <div class="ativo-name">Grupo Mateus</div>
+              <div class="ativo-desc">Rede de supermercados com forte presença no Nordeste brasileiro. Empresa sólida, em expansão e com bom Dividend Yield de 6,01%.</div>
+            </div>
+            <div class="ativo-value"><div class="ativo-val">R$ 515</div><div class="ativo-pct">21,1% da classe</div></div>
+            <div class="ativo-badge badge-ok">Recomendado</div>
+          </div>
+          <div class="ativo-item">
+            <div class="ativo-ticker">PRIO3</div>
+            <div class="ativo-info">
+              <div class="ativo-name">PRIO (PetroRio)</div>
+              <div class="ativo-desc">Empresa de extração de petróleo com foco em campos maduros. Alta eficiência operacional. Adicionada para capturar potencial de valorização no setor de energia.</div>
+            </div>
+            <div class="ativo-value"><div class="ativo-val">R$ 198</div><div class="ativo-pct">8,1% da classe</div></div>
+            <div class="ativo-badge badge-ok">Recomendado</div>
+          </div>
+          <div class="ativo-item" style="opacity:.65">
+            <div class="ativo-ticker">BBSE3</div>
+            <div class="ativo-info">
+              <div class="ativo-name">BB Seguridade</div>
+              <div class="ativo-desc">Empresa de seguros e previdência do Banco do Brasil. Boa pagadora de dividendos, mas fora da carteira recomendada atual — posição a ser naturalmente diluída com o tempo.</div>
+            </div>
+            <div class="ativo-value"><div class="ativo-val">R$ 151</div><div class="ativo-pct">6,2% da classe</div></div>
+            <div class="ativo-badge badge-att">Aguardar</div>
+          </div>
+          <div class="ativo-item" style="opacity:.65">
+            <div class="ativo-ticker">Outras</div>
+            <div class="ativo-info">
+              <div class="ativo-name">Demais posições herdadas</div>
+              <div class="ativo-desc">PETR4, DASA3, EQTL3, HAPV3, ITSA4, MSFT34 e ROXO34 — posições anteriores fora da carteira recomendada atual. Mantidas sem pressa; serão reavaliadas a cada revisão.</div>
+            </div>
+            <div class="ativo-value"><div class="ativo-val">R$ 1.103</div><div class="ativo-pct">45,3% da classe</div></div>
+            <div class="ativo-badge badge-att">Aguardar</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FIIs -->
+    <div style="margin-bottom:.75rem">
+      <div class="collapsible-header" onclick="toggleCollapse('col-fiis')">
+        <div>
+          <div class="collapsible-title">R — Real Estate · Fundos Imobiliários</div>
+          <div class="collapsible-sub">R$ 5.157 · 20,9% da carteira · 4 FIIs</div>
+        </div>
+        <div class="collapsible-arrow" id="arrow-col-fiis">▼</div>
+      </div>
+      <div class="collapsible-body" id="col-fiis">
+        <div class="ativo-list">
+          <div class="ativo-item">
+            <div class="ativo-ticker">XPML11</div>
+            <div class="ativo-info">
+              <div class="ativo-name">XP Malls</div>
+              <div class="ativo-desc">Fundo de shoppings centers premium. DY de 10,18%. Portfólio com ativos de alto padrão em localizações estratégicas — renda mensal com potencial de valorização das cotas.</div>
+            </div>
+            <div class="ativo-value"><div class="ativo-val">R$ 1.776</div><div class="ativo-pct">34,4% da classe</div></div>
+            <div class="ativo-badge badge-ok">Recomendado</div>
+          </div>
+          <div class="ativo-item">
+            <div class="ativo-ticker">CPTS11</div>
+            <div class="ativo-info">
+              <div class="ativo-name">Capitânia Securities II</div>
+              <div class="ativo-desc">Fundo de papel (CRIs) com DY de 13,26% — um dos mais altos da carteira. Investe em crédito imobiliário, com boa proteção contra inflação. Cotas abaixo do preço máximo de compra.</div>
+            </div>
+            <div class="ativo-value"><div class="ativo-val">R$ 1.225</div><div class="ativo-pct">23,8% da classe</div></div>
+            <div class="ativo-badge badge-ok">Recomendado</div>
+          </div>
+          <div class="ativo-item">
+            <div class="ativo-ticker">PSEC11</div>
+            <div class="ativo-info">
+              <div class="ativo-name">Pátria Securities</div>
+              <div class="ativo-desc">Fundo de papel com DY expressivo de 13,23%. Gestão da Pátria Investimentos, referência no mercado. Posição relevante que já gera boa renda passiva mensal.</div>
+            </div>
+            <div class="ativo-value"><div class="ativo-val">R$ 1.148</div><div class="ativo-pct">22,3% da classe</div></div>
+            <div class="ativo-badge badge-ok">Recomendado</div>
+          </div>
+          <div class="ativo-item">
+            <div class="ativo-ticker">PVBI11</div>
+            <div class="ativo-info">
+              <div class="ativo-name">VBI Prime Properties</div>
+              <div class="ativo-desc">Fundo de lajes corporativas de alto padrão em São Paulo. DY de 7,11%. Cotas com desconto significativo em relação ao preço máximo de compra — bom ponto de entrada.</div>
+            </div>
+            <div class="ativo-value"><div class="ativo-val">R$ 1.008</div><div class="ativo-pct">19,5% da classe</div></div>
+            <div class="ativo-badge badge-ok">Recomendado</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CAIXA -->
+    <div style="margin-bottom:.75rem">
+      <div class="collapsible-header" onclick="toggleCollapse('col-caixa')">
+        <div>
+          <div class="collapsible-title">C — Caixa · Renda Fixa</div>
+          <div class="collapsible-sub">R$ 14.058 · 57,0% da carteira · 2 títulos</div>
+        </div>
+        <div class="collapsible-arrow" id="arrow-col-caixa">▼</div>
+      </div>
+      <div class="collapsible-body" id="col-caixa">
+        <div class="ativo-list">
+          <div class="ativo-item">
+            <div class="ativo-ticker">Tes. Selic</div>
+            <div class="ativo-info">
+              <div class="ativo-name">Tesouro Selic 2027</div>
+              <div class="ativo-desc">O título mais seguro do Brasil, emitido pelo governo federal. Acompanha a taxa Selic diariamente. Liquidez diária: o dinheiro está sempre disponível quando você precisar.</div>
+            </div>
+            <div class="ativo-value"><div class="ativo-val">R$ 13.005</div><div class="ativo-pct">92,5% da classe</div></div>
+            <div class="ativo-badge badge-ok">Adequado</div>
+          </div>
+          <div class="ativo-item">
+            <div class="ativo-ticker">Tes. Pré</div>
+            <div class="ativo-info">
+              <div class="ativo-name">Tesouro Prefixado 2028</div>
+              <div class="ativo-desc">Taxa travada desde a compra — você sabe exatamente quanto vai receber no vencimento. Complementa o Tesouro Selic com uma parcela de taxa garantida.</div>
+            </div>
+            <div class="ativo-value"><div class="ativo-val">R$ 1.053</div><div class="ativo-pct">7,5% da classe</div></div>
+            <div class="ativo-badge badge-ok">Adequado</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- INTERNACIONAIS -->
+    <div style="margin-bottom:.75rem">
+      <div class="collapsible-header" onclick="toggleCollapse('col-inter')">
+        <div>
+          <div class="collapsible-title">A — Alternativos · Internacional</div>
+          <div class="collapsible-sub">R$ 2.993 · 12,1% da carteira · 3 ETFs</div>
+        </div>
+        <div class="collapsible-arrow" id="arrow-col-inter">▼</div>
+      </div>
+      <div class="collapsible-body" id="col-inter">
+        <div class="ativo-list">
+          <div class="ativo-item">
+            <div class="ativo-ticker">WRLD11</div>
+            <div class="ativo-info">
+              <div class="ativo-name">Investo FTSE Global Equities</div>
+              <div class="ativo-desc">ETF que investe nas maiores empresas do mundo — Apple, Microsoft, Amazon, Nestlé, Samsung e outras. Exposição global mais diversificada. Cotado em dólar, protege contra desvalorização do real.</div>
+            </div>
+            <div class="ativo-value"><div class="ativo-val">R$ 1.854</div><div class="ativo-pct">62% da classe</div></div>
+            <div class="ativo-badge badge-ok">Recomendado</div>
+          </div>
+          <div class="ativo-item">
+            <div class="ativo-ticker">USDB11</div>
+            <div class="ativo-info">
+              <div class="ativo-name">ETF Dólar</div>
+              <div class="ativo-desc">Exposição direta ao dólar americano via ETF na bolsa brasileira. Funciona como um seguro cambial — quando o dólar sobe, essa posição valoriza e protege o poder de compra do seu patrimônio.</div>
+            </div>
+            <div class="ativo-value"><div class="ativo-val">R$ 980</div><div class="ativo-pct">32,7% da classe</div></div>
+            <div class="ativo-badge badge-ok">Recomendado</div>
+          </div>
+          <div class="ativo-item">
+            <div class="ativo-ticker">GOLD11</div>
+            <div class="ativo-info">
+              <div class="ativo-name">Trend ETF LBMA Ouro</div>
+              <div class="ativo-desc">Exposição ao ouro físico via ETF brasileiro. O ouro é o ativo de proteção mais antigo do mundo — valoriza em momentos de crise e incerteza, equilibrando a carteira quando outros ativos caem.</div>
+            </div>
+            <div class="ativo-value"><div class="ativo-val">R$ 159</div><div class="ativo-pct">5,3% da classe</div></div>
+            <div class="ativo-badge badge-ok">Recomendado</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- APORTE DO MÊS -->
+  <section class="section" id="sec-aporte">
+    <div class="section-label">Aporte · Junho 2026</div>
+    <h2 class="section-title">Como alocar seus R$ 10.483</h2>
+    <div class="section-divider"></div>
+    <p class="section-intro">Com base na sua alocação atual versus o objetivo estrutural, o aporte deste mês prioriza o reforço do Caixa — a classe mais estratégica para os seus projetos de vida no prazo definido.</p>
+
+    <div class="aporte-card">
+      <div class="aporte-header">
+        <div>
+          <div class="aporte-classe">C — Caixa · Renda Fixa</div>
+          <div style="font-size:.82rem;color:var(--text-muted);margin-top:.2rem">Classe abaixo do objetivo: atual 57% → meta 75%</div>
+        </div>
+        <div class="aporte-total">R$ 10.388</div>
+      </div>
+      <div class="aporte-items">
+        <div class="aporte-line">
+          <div class="aporte-line-name">CDB Daycoval (104% CDI) · liquidez diária</div>
+          <div class="aporte-line-val">R$ 10.388</div>
+        </div>
+      </div>
+      <div class="aporte-note">💡 Concentramos o aporte em CDB com liquidez diária para manter flexibilidade. Quando chegar perto da data do carro (dez/2026), o dinheiro estará disponível sem carência. Rendimento estimado: 104% do CDI (~15,5% a.a.).</div>
+    </div>
+
+    <div class="aporte-card">
+      <div class="aporte-header">
+        <div>
+          <div class="aporte-classe">R — Real Estate · FIIs</div>
+          <div style="font-size:.82rem;color:var(--text-muted);margin-top:.2rem">Complemento para aproximar da meta</div>
+        </div>
+        <div class="aporte-total">R$ 95</div>
+      </div>
+      <div class="aporte-items">
+        <div class="aporte-line">
+          <div class="aporte-line-name">PVBI11 · VBI Prime Properties (abaixo do preço máx.)</div>
+          <div class="aporte-line-val">R$ 95</div>
+        </div>
+      </div>
+      <div class="aporte-note">💡 PVBI11 está cotada abaixo do preço máximo de compra (R$ 72,99 vs. teto de R$ 110,00). Com R$ 95, você compra ~1 cota e amplia sua renda de dividendos mensais isentos de IR.</div>
+    </div>
+
+    <div style="background:rgba(201,168,76,0.06);border:1px solid rgba(201,168,76,0.2);border-radius:12px;padding:1.25rem;margin-top:1.5rem;display:flex;align-items:center;gap:1rem">
+      <div style="font-size:1.3rem">📌</div>
+      <div>
+        <div style="font-size:.88rem;color:var(--text-primary);font-weight:600;margin-bottom:.25rem">Ações: aguardar</div>
+        <div style="font-size:.8rem;color:var(--text-muted);line-height:1.6">A classe de Ações já está acima do objetivo (9,9% vs. meta 5%). Não há aporte nesta classe este mês. Nenhuma venda necessária — as posições serão naturalmente diluídas com os próximos aportes.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- DIAGNÓSTICO -->
+  <section class="section" id="sec-diagnostico">
+    <div class="section-label">Diagnóstico</div>
+    <h2 class="section-title">O que encontramos</h2>
+    <div class="section-divider"></div>
+
+    <div class="finding-list">
+      <div class="finding-item">
+        <div class="finding-badge badge-success">Adequado</div>
+        <div class="finding-body">
+          <div class="finding-title">Reserva de Emergência: 100% constituída</div>
+          <div class="finding-desc">Sua reserva de emergência de R$ 142.927 está completamente formada e alocada com liquidez imediata. Isso é fundamental — significa que seus investimentos nunca precisarão ser interrompidos por um imprevisto.</div>
+        </div>
+      </div>
+      <div class="finding-item">
+        <div class="finding-badge badge-success">Adequado</div>
+        <div class="finding-body">
+          <div class="finding-title">FIIs com dividendos sólidos e isentos de IR</div>
+          <div class="finding-desc">PSEC11 (13,2%), CPTS11 (13,3%) e XPML11 (10,2%) são fundos robustos e recomendados. Juntos, já geram uma renda mensal consistente e isenta de imposto de renda — que cresce a cada aporte nessa classe.</div>
+        </div>
+      </div>
+      <div class="finding-item">
+        <div class="finding-badge badge-warning">Atenção</div>
+        <div class="finding-body">
+          <div class="finding-title">Caixa abaixo do objetivo — sendo corrigido</div>
+          <div class="finding-desc">A classe de Caixa está em 57%, mas o objetivo é 75%. É natural em carteiras em construção. Seus projetos de vida (carro e apartamento) demandam essa base mais robusta de renda fixa. O aporte deste mês endereça exatamente isso.</div>
+        </div>
+      </div>
+      <div class="finding-item">
+        <div class="finding-badge badge-warning">Atenção</div>
+        <div class="finding-body">
+          <div class="finding-title">Ações acima do objetivo — posições herdadas</div>
+          <div class="finding-desc">A classe de Ações está em 9,9% (meta: 5%). Parte das posições são de uma fase anterior e não fazem parte da carteira recomendada atual. Não é necessário vender agora — elas serão naturalmente diluídas com o crescimento dos aportes futuros.</div>
+        </div>
+      </div>
+      <div class="finding-item">
+        <div class="finding-badge badge-info">Trajetória</div>
+        <div class="finding-body">
+          <div class="finding-title">Patrimônio em construção — consistência é o caminho</div>
+          <div class="finding-desc">Com R$ 35.127 investidos e aportes mensais regulares, sua carteira está evoluindo no ritmo certo. A consistência dos aportes é o principal fator de sucesso — mais importante do que escolher o "melhor" ativo do momento.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROJETOS DE VIDA -->
+  <section class="section" id="sec-objetivos">
+    <div class="section-label">Projetos de Vida</div>
+    <h2 class="section-title">Para onde você está indo</h2>
+    <div class="section-divider"></div>
+    <p class="section-intro">Seus investimentos existem para realizar o que importa para você. Estes são os objetivos que guiam cada decisão da sua carteira.</p>
+
+    <div class="obj-grid">
+      <div class="obj-card" style="grid-column:1/-1">
+        <div class="obj-icon">🚗</div>
+        <div class="obj-name">Troca do Carro (T-Cross)</div>
+        <div class="obj-date">Dezembro 2026 · Meta de acumulação</div>
+
+        <!-- RESUMO DA SITUAÇÃO -->
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:.75rem;margin:1rem 0">
+          <div style="background:var(--bg-elevated);border-radius:8px;padding:.9rem;text-align:center">
+            <div style="font-family:'DM Mono',monospace;font-size:1.1rem;color:var(--gold)">R$ 180.000</div>
+            <div style="font-size:.68rem;text-transform:uppercase;letter-spacing:.1em;color:var(--text-muted);margin-top:.25rem">Valor do T-Cross</div>
+          </div>
+          <div style="background:var(--bg-elevated);border-radius:8px;padding:.9rem;text-align:center">
+            <div style="font-family:'DM Mono',monospace;font-size:1.1rem;color:#4CAF8C">R$ 30.000</div>
+            <div style="font-size:.68rem;text-transform:uppercase;letter-spacing:.1em;color:var(--text-muted);margin-top:.25rem">Carro atual (troca)</div>
+          </div>
+          <div style="background:var(--bg-elevated);border-radius:8px;padding:.9rem;text-align:center">
+            <div style="font-family:'DM Mono',monospace;font-size:1.1rem;color:var(--gold)">R$ 150.000</div>
+            <div style="font-size:.68rem;text-transform:uppercase;letter-spacing:.1em;color:var(--text-muted);margin-top:.25rem">Valor líquido necessário</div>
+          </div>
+          <div style="background:var(--bg-elevated);border-radius:8px;padding:.9rem;text-align:center">
+            <div style="font-family:'DM Mono',monospace;font-size:1.1rem;color:#7BA7E0">R$ 53.128</div>
+            <div style="font-size:.68rem;text-transform:uppercase;letter-spacing:.1em;color:var(--text-muted);margin-top:.25rem">Já acumulado</div>
+          </div>
+        </div>
+
+        <!-- BARRA DE PROGRESSO GERAL -->
+        <div style="margin:1.25rem 0 .4rem">
+          <div style="display:flex;justify-content:space-between;font-size:.72rem;color:var(--text-muted);margin-bottom:.4rem">
+            <span>Progresso em direção ao objetivo</span>
+            <span style="color:var(--gold);font-family:'DM Mono',monospace">35,4% acumulado</span>
+          </div>
+          <div style="background:rgba(255,255,255,0.06);border-radius:20px;height:8px;overflow:hidden">
+            <div style="width:35.4%;height:100%;border-radius:20px;background:linear-gradient(90deg,var(--gold),var(--gold-light))"></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-family:'DM Mono',monospace;font-size:.7rem;color:var(--text-muted);margin-top:.3rem">
+            <span>R$ 53.128 acumulados</span><span>Meta: R$ 150.000</span>
+          </div>
+        </div>
+
+        <!-- PROJEÇÃO -->
+        <div style="font-size:.78rem;color:var(--text-muted);padding:.75rem;background:rgba(91,155,213,0.07);border:1px solid rgba(91,155,213,0.2);border-radius:8px;margin:1rem 0;line-height:1.7">
+          📊 <strong style="color:var(--text-primary)">Projeção para dez/2026:</strong> com rendimento do CDB (~1,1%/mês) sobre o saldo atual + aportes mensais médios de R$ 10.000, você deve acumular entre <strong style="color:var(--gold-light)">R$ 115.000 e R$ 120.000</strong> em carteira até dezembro. Somando a troca de R$ 30.000, total disponível: <strong style="color:var(--gold-light)">~R$ 145.000–150.000</strong>.
+        </div>
+
+        <!-- CENÁRIOS -->
+        <div style="font-size:.7rem;text-transform:uppercase;letter-spacing:.15em;color:var(--gold);margin-bottom:.75rem">Cenários de compra</div>
+        <div style="display:flex;flex-direction:column;gap:.6rem">
+
+          <div style="background:rgba(76,175,140,0.08);border:1px solid rgba(76,175,140,0.25);border-radius:10px;padding:1rem;display:flex;gap:.9rem;align-items:flex-start">
+            <div style="background:rgba(76,175,140,0.2);color:#4CAF8C;font-size:.65rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:.3rem .6rem;border-radius:20px;white-space:nowrap;flex-shrink:0">Preferencial</div>
+            <div>
+              <div style="font-size:.88rem;color:var(--text-primary);font-weight:600;margin-bottom:.3rem">🏆 À vista integral — R$ 150.000 acumulado + troca R$ 30k</div>
+              <div style="font-size:.78rem;color:var(--text-muted);line-height:1.6">Usa todo o saldo acumulado (R$ 120k) + troca do carro (R$ 30k). Sem parcelas, sem juros, sem comprometimento de renda futura. Melhor custo total. <strong style="color:#4CAF8C">Viável se mantiver aporte médio de R$ 10.500/mês.</strong></div>
+            </div>
+          </div>
+
+          <div style="background:rgba(201,168,76,0.06);border:1px solid rgba(201,168,76,0.2);border-radius:10px;padding:1rem;display:flex;gap:.9rem;align-items:flex-start">
+            <div style="background:rgba(201,168,76,0.15);color:var(--gold);font-size:.65rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:.3rem .6rem;border-radius:20px;white-space:nowrap;flex-shrink:0">Alternativa A</div>
+            <div>
+              <div style="font-size:.88rem;color:var(--text-primary);font-weight:600;margin-bottom:.3rem">Entrada grande + financiamento curto</div>
+              <div style="font-size:.78rem;color:var(--text-muted);line-height:1.6">Entrada: R$ 120k acumulado + R$ 30k troca = <strong style="color:var(--gold-light)">R$ 150k</strong>. Financia apenas R$ 30.000 em 12x. Parcela estimada: ~R$ 2.800/mês. Juros mínimos, comprometimento baixo de renda.</div>
+            </div>
+          </div>
+
+          <div style="background:rgba(139,143,168,0.06);border:1px solid rgba(139,143,168,0.15);border-radius:10px;padding:1rem;display:flex;gap:.9rem;align-items:flex-start">
+            <div style="background:rgba(139,143,168,0.12);color:var(--text-muted);font-size:.65rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:.3rem .6rem;border-radius:20px;white-space:nowrap;flex-shrink:0">Alternativa B</div>
+            <div>
+              <div style="font-size:.88rem;color:var(--text-primary);font-weight:600;margin-bottom:.3rem">Entrada média + financiamento moderado</div>
+              <div style="font-size:.78rem;color:var(--text-muted);line-height:1.6">Entrada: R$ 90k acumulado + R$ 30k troca = <strong style="color:var(--text-primary)">R$ 120k</strong>. Financia R$ 60.000 em 24x. Parcela estimada: ~R$ 2.900/mês. Deixa R$ 30k investidos como colchão. Menos eficiente no custo total.</div>
+            </div>
+          </div>
+
+        </div>
+
+        <div style="font-size:.78rem;color:var(--text-muted);margin-top:1rem;padding-top:1rem;border-top:1px solid var(--border);line-height:1.7">
+          💡 <strong style="color:var(--text-primary)">Recomendação:</strong> manter o foco nos aportes mensais de Caixa e revisar o cenário em outubro/2026 com o saldo real acumulado. A decisão final entre à vista ou entrada grande será tomada na reunião de outubro, quando teremos os números exatos.
+        </div>
+      </div>
+      <div class="obj-card">
+        <div class="obj-icon">🏠</div>
+        <div class="obj-name">Apartamento</div>
+        <div class="obj-date">Agosto 2031 · Financiamento · 360x</div>
+        <div style="font-size:.82rem;color:var(--text-muted);margin-bottom:1rem">Valor total: <span style="color:var(--gold);font-family:'DM Mono',monospace">R$ 900.000</span></div>
+        <div style="font-size:.8rem;color:var(--text-muted);line-height:1.6;margin-top:.75rem;padding:.75rem;background:rgba(232,168,60,0.07);border:1px solid rgba(232,168,60,0.2);border-radius:8px">⏳ Aportes para este objetivo ainda não iniciados. Foco atual: conquista do T-Cross (dez/2026). O planejamento do apartamento começa em sequência, com aporte mensal previsto de R$ 7.000.</div>
+      </div>
+      <div class="obj-card" style="border-color:rgba(201,168,76,0.3);grid-column:1/-1">
+        <div class="obj-icon">🏖️</div>
+        <div class="obj-name">Independência Financeira</div>
+        <div class="obj-date">Aos 60 anos · Longo prazo</div>
+        <div style="font-size:.82rem;color:var(--text-muted);margin-bottom:1rem">Patrimônio necessário: <span style="color:var(--gold);font-family:'DM Mono',monospace">R$ 8.968.920</span> · Renda desejada: <span style="color:var(--gold);font-family:'DM Mono',monospace">R$ 40.000/mês</span></div>
+        <div class="obj-progress-wrap"><div class="obj-progress-bar" style="width:0.4%;background:linear-gradient(90deg,#9B59B6,#C9A84C)"></div></div>
+        <div class="obj-progress-labels"><span>Alocado: R$ 25.401</span><span>Meta: R$ 8.968.920</span></div>
+        <div class="obj-meta">Prazo: ~30 anos. Com investimento mensal de R$ 15.000 e taxa de retorno consistente, o patrimônio projetado cobre a renda desejada aos 60 anos. O tempo é o maior aliado nesse objetivo — cada mês conta.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- INDEPENDÊNCIA FINANCEIRA -->
+  <section class="section" id="sec-independencia">
+    <div class="section-label">Independência Financeira</div>
+    <h2 class="section-title">Seu maior objetivo de longo prazo</h2>
+    <div class="section-divider"></div>
+    <p class="section-intro">A independência financeira é o horizonte que orienta toda a estrutura da sua carteira. Tudo que construímos hoje — cada aporte, cada decisão — aponta para esse destino.</p>
+
+    <div class="indep-hero">
+      <div class="indep-label">Patrimônio necessário para independência</div>
+      <div style="height:.5rem"></div>
+      <div class="indep-valor">R$ 8.968.920</div>
+      <div style="height:.5rem"></div>
+      <div style="font-size:.82rem;color:var(--text-muted)">Para gerar <strong style="color:var(--gold-light)">R$ 40.000/mês</strong> de renda passiva vitalícia, aposentando aos <strong style="color:var(--gold-light)">60 anos</strong></div>
+    </div>
+
+    <div class="indep-grid">
+      <div class="indep-card">
+        <div class="indep-card-val">60 anos</div>
+        <div class="indep-card-label">Idade de aposentadoria</div>
+      </div>
+      <div class="indep-card">
+        <div class="indep-card-val">R$ 40.000</div>
+        <div class="indep-card-label">Renda mensal desejada</div>
+      </div>
+      <div class="indep-card">
+        <div class="indep-card-val">R$ 15.000</div>
+        <div class="indep-card-label">Investimento mensal necessário</div>
+      </div>
+      <div class="indep-card">
+        <div class="indep-card-val">R$ 25.401</div>
+        <div class="indep-card-label">Já alocado neste objetivo</div>
+      </div>
+    </div>
+
+    <div class="indep-chart-wrap">
+      <div class="chart-box-title">Projeção patrimonial até a independência</div>
+      <div style="position:relative;height:300px"><canvas id="chartIndependencia"></canvas></div>
+    </div>
+
+    <div style="background:rgba(155,89,182,0.08);border:1px solid rgba(155,89,182,0.25);border-radius:12px;padding:1.5rem;margin-top:1.5rem">
+      <div style="font-size:.88rem;color:var(--text-primary);font-weight:600;margin-bottom:.75rem">💡 Como funciona esse número</div>
+      <div style="font-size:.82rem;color:var(--text-muted);line-height:1.8">
+        Para viver de renda sem consumir o patrimônio, você precisa acumular o suficiente para que os juros dos investimentos cubram sua despesa mensal. Com R$ 40.000/mês de renda desejada e uma taxa segura de retirada de ~4,5% ao ano, o cálculo aponta para um patrimônio de <strong style="color:var(--gold-light)">R$ 8,9 milhões</strong>. 
+        <br><br>
+        Com aportes mensais consistentes de R$ 15.000 e tempo a seu favor, esse objetivo é totalmente viável — e a carteira ARCA que estamos construindo hoje é o veículo para chegar lá.
+      </div>
+    </div>
+  </section>
+
+  <!-- PLANO DE AÇÃO -->
+  <section class="section" id="sec-plano">
+    <div class="section-label">Plano de Ação</div>
+    <h2 class="section-title">Seus próximos 90 dias</h2>
+    <div class="section-divider"></div>
+
+    <div class="timeline">
+      <div class="timeline-phase">
+        <div class="phase-header">
+          <div class="phase-badge">Agora</div>
+          <div class="phase-range">Junho 2026 · Imediato</div>
+        </div>
+        <div class="phase-actions">
+          <div class="action-item">
+            <div class="action-icon">→</div>
+            <div class="action-body">
+              <div class="action-title">Realizar o aporte de R$ 10.483 conforme plano</div>
+              <div class="action-who">Responsável: Ellen · R$ 10.388 no CDB + R$ 95 em PVBI11</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="timeline-phase">
+        <div class="phase-header">
+          <div class="phase-badge">Julho</div>
+          <div class="phase-range">30–60 dias · Continuidade</div>
+        </div>
+        <div class="phase-actions">
+          <div class="action-item">
+            <div class="action-icon">→</div>
+            <div class="action-body">
+              <div class="action-title">Manter aporte mensal priorizando Caixa</div>
+              <div class="action-who">Responsável: Ellen + Matheus · Revisão do valor de aporte</div>
+            </div>
+          </div>
+          <div class="action-item">
+            <div class="action-icon">→</div>
+            <div class="action-body">
+              <div class="action-title">Monitorar prazo do carro — ajustar estratégia se necessário</div>
+              <div class="action-who">Responsável: Matheus · Reunião de acompanhamento</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="timeline-phase">
+        <div class="phase-header">
+          <div class="phase-badge">Ago–Set</div>
+          <div class="phase-range">60–90 dias · Revisão</div>
+        </div>
+        <div class="phase-actions">
+          <div class="action-item">
+            <div class="action-icon">→</div>
+            <div class="action-body">
+              <div class="action-title">Revisão trimestral completa da carteira</div>
+              <div class="action-who">Responsável: Matheus · Diagnóstico de adequação ARCA</div>
+            </div>
+          </div>
+          <div class="action-item">
+            <div class="action-icon">→</div>
+            <div class="action-body">
+              <div class="action-title">Avaliar redução gradual de posições fora da carteira recomendada</div>
+              <div class="action-who">Responsável: Matheus · Sem pressa, sem prejuízo desnecessário</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRÓXIMOS PASSOS -->
+  <section class="section">
+    <div class="section-label">Próximos Passos</div>
+    <h2 class="section-title">O que acontece a seguir</h2>
+    <div class="section-divider"></div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.25rem">
+      <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:14px;padding:1.5rem">
+        <div style="font-size:1.5rem;margin-bottom:.75rem">📲</div>
+        <div style="font-size:.9rem;color:var(--text-primary);font-weight:600;margin-bottom:.5rem">Realize o aporte</div>
+        <div style="font-size:.8rem;color:var(--text-muted);line-height:1.6">Aplique R$ 10.388 no CDB e R$ 95 em PVBI11. Qualquer dúvida no processo, estou disponível pelo WhatsApp.</div>
+      </div>
+      <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:14px;padding:1.5rem">
+        <div style="font-size:1.5rem;margin-bottom:.75rem">📅</div>
+        <div style="font-size:.9rem;color:var(--text-primary);font-weight:600;margin-bottom:.5rem">Próxima reunião</div>
+        <div style="font-size:.8rem;color:var(--text-muted);line-height:1.6">Revisão mensal para acompanhar a evolução do patrimônio, ajustar o aporte e manter o plano alinhado com seus objetivos.</div>
+      </div>
+      <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:14px;padding:1.5rem">
+        <div style="font-size:1.5rem;margin-bottom:.75rem">🎯</div>
+        <div style="font-size:.9rem;color:var(--text-primary);font-weight:600;margin-bottom:.5rem">Foco: carro em dezembro</div>
+        <div style="font-size:.8rem;color:var(--text-muted);line-height:1.6">Com 6 meses pela frente e aportes consistentes, a entrada do T-Cross é um objetivo concreto e alcançável. Cada real aportado hoje é um passo a menos para o sonho.</div>
+      </div>
+      <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:14px;padding:1.5rem">
+        <div style="font-size:1.5rem;margin-bottom:.75rem">🏖️</div>
+        <div style="font-size:.9rem;color:var(--text-primary);font-weight:600;margin-bottom:.5rem">Construindo a independência</div>
+        <div style="font-size:.8rem;color:var(--text-muted);line-height:1.6">Cada mês que você investe hoje é tempo comprado para a liberdade financeira aos 60. O tempo e os juros compostos trabalham a seu favor — a consistência é o único segredo.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="footer-monogram">MM</div>
+    <div class="footer-name">Matheus Melo</div>
+    <div class="footer-title">Planejador Financeiro Pessoal · CFP®</div>
+    <div class="footer-brand">Grão | Grupo Primo</div>
+    <div class="footer-contact">Instagram: @financasmatheus.melo</div>
+    <div class="footer-contact">WhatsApp: (99) 99175-6837</div>
+    <br>
+    <div class="footer-disclaimer">Este documento é confidencial e foi elaborado exclusivamente para Ellen Vaz. As recomendações contidas têm caráter fiduciário e são baseadas nas informações coletadas até a data de emissão. Junho de 2026.</div>
+  </footer>
+
+</div>
+
+<script>
+function checkPassword(){
+  const v=document.getElementById("pwd-input").value;
+  if(v==="ellen2026"){
+    document.getElementById("password-overlay").style.display="none";
+    document.getElementById("main-content").style.display="block";
+    initCharts();
+  } else {
+    document.getElementById("pwd-error").style.display="block";
+  }
+}
+document.getElementById("pwd-input").addEventListener("keypress",function(e){if(e.key==="Enter")checkPassword()});
+
+function scrollTo(id){
+  document.getElementById(id).scrollIntoView({behavior:"smooth",block:"start"});
+}
+
+function toggleCollapse(id){
+  const body=document.getElementById(id);
+  const arrow=document.getElementById("arrow-"+id);
+  const isOpen=body.classList.contains("open");
+  body.classList.toggle("open",!isOpen);
+  arrow.classList.toggle("open",!isOpen);
+}
+
+function initCharts(){
+  const colors=["#C9A84C","#4CAF8C","#5B9BD5","#9B59B6"];
+  const opts={responsive:true,maintainAspectRatio:false,plugins:{legend:{position:"bottom",labels:{color:"#8B8FA8",font:{family:"DM Sans",size:12},padding:12,boxWidth:12}},tooltip:{callbacks:{label:(ctx)=>` ${ctx.label}: ${ctx.parsed}%`}}},cutout:"68%"};
+
+  new Chart(document.getElementById("chartAtual"),{
+    type:"doughnut",
+    data:{
+      labels:["Ações (9,9%)","Real Estate (20,9%)","Caixa (57,0%)","Internacional (12,1%)"],
+      datasets:[{data:[9.9,20.9,57.0,12.1],backgroundColor:colors,borderColor:"#0A0C1A",borderWidth:3}]
+    },
+    options:JSON.parse(JSON.stringify(opts))
+  });
+
+  new Chart(document.getElementById("chartObjetivo"),{
+    type:"doughnut",
+    data:{
+      labels:["Ações (5%)","Real Estate (15%)","Caixa (75%)","Alternativos (5%)"],
+      datasets:[{data:[5,15,75,5],backgroundColor:colors,borderColor:"#0A0C1A",borderWidth:3}]
+    },
+    options:JSON.parse(JSON.stringify(opts))
+  });
+
+  // Projeção independência
+  const anos=[];
+  const atual=[];
+  const ideal=[];
+  let pat=35127;
+  const meta=8968920;
+  const aporte=15000;
+  const taxa=0.009; // ~11% a.a. mensal
+  for(let a=0;a<=30;a++){
+    anos.push(30+a);
+    atual.push(Math.round(pat));
+    ideal.push(meta);
+    for(let m=0;m<12;m++){pat=pat*(1+taxa)+aporte;}
+  }
+  new Chart(document.getElementById("chartIndependencia"),{
+    type:"line",
+    data:{
+      labels:anos,
+      datasets:[
+        {label:"Patrimônio projetado",data:atual,borderColor:"#C9A84C",backgroundColor:"rgba(201,168,76,0.08)",tension:.4,fill:true,pointRadius:3,pointBackgroundColor:"#C9A84C"},
+        {label:"Meta de independência",data:ideal,borderColor:"rgba(155,89,182,0.6)",borderDash:[6,4],backgroundColor:"transparent",tension:0,pointRadius:0}
+      ]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{position:"bottom",labels:{color:"#8B8FA8",font:{family:"DM Sans",size:12},padding:12,boxWidth:12}},
+        tooltip:{callbacks:{label:(ctx)=>" R$ "+ctx.parsed.y.toLocaleString("pt-BR")}}},
+      scales:{
+        x:{grid:{color:"rgba(255,255,255,0.04)"},ticks:{color:"#8B8FA8",font:{size:11}},title:{display:true,text:"Idade",color:"#8B8FA8",font:{size:11}}},
+        y:{grid:{color:"rgba(255,255,255,0.04)"},ticks:{color:"#8B8FA8",font:{size:11},callback:(v)=>"R$"+Math.round(v/1000)+"k"}}
+      }
+    }
+  });
+}
+</script>
+</body>
+</html>
